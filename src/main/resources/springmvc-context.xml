@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:task="http://www.springframework.org/schema/task" 	
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+    http://www.springframework.org/schema/beans/spring-beans-2.5.xsd  
+    http://www.springframework.org/schema/context  
+    http://www.springframework.org/schema/context/spring-context-2.5.xsd  
+    http://www.springframework.org/schema/aop  
+    http://www.springframework.org/schema/aop/spring-aop-2.5.xsd  
+    http://www.springframework.org/schema/tx  
+    http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+    http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+    http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.1.xsd  ">
+    
+
+ 	<mvc:annotation-driven />
+ 	
+    <!-- ①：对web包中的所有类进行扫描，以完成Bean创建和自动依赖注入的功能 -->
+    <context:component-scan base-package="com.**.rent"/>
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+    	<property name="messageConverters">
+    		<list>
+    			<bean class="org.springframework.http.converter.StringHttpMessageConverter">
+    			<constructor-arg value="UTF-8" index="0"></constructor-arg>
+    			</bean>
+    			<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+    			</bean>
+    		</list>
+    	</property>
+    </bean>
+    
+    <!-- 视图解析器 -->
+    <bean
+        class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/"></property>
+        <property name="suffix" value=".jsp"></property>
+    </bean>
+    
+    <!-- 拦截器使用 -->
+    <mvc:interceptors>  
+	    <!-- app拦截器 -->
+	    <mvc:interceptor>  
+	        <!-- 进行拦截：/**表示拦截所有controller -->
+	        <mvc:mapping path="/*.do" />
+	    	<!-- 不进行拦截 -->
+	        <mvc:exclude-mapping path="/login.do"/>
+	        <mvc:exclude-mapping path="/register.do"/>
+	        <mvc:exclude-mapping path="/sendSms.do"/>
+	        <mvc:exclude-mapping path="/modifyPwd.do"/>
+	        <mvc:exclude-mapping path="/getArea.do"/>
+	        <mvc:exclude-mapping path="/getTradeArea.do"/>
+	        <mvc:exclude-mapping path="/getCooperation.do"/>
+	        <mvc:exclude-mapping path="/addCooperation.do"/>
+	        <mvc:exclude-mapping path="/quickLogin.do"/>
+	        <mvc:exclude-mapping path="/appActive.do"/>
+	        <bean class="com.dpp.rent.app.web.interceptor.LoginInterceptor"/>  
+	    </mvc:interceptor>
+	      
+	    <!-- web请求 -->
+	    <mvc:interceptor>  
+	        <mvc:mapping path="/*.action" />
+	        <mvc:exclude-mapping path="/web_login.action"/>
+	        <bean class="com.dpp.rent.app.web.interceptor.WebLoginInterceptor"/>  
+	    </mvc:interceptor> 
+	    
+	    <!--日志拦截器  -->
+	    <mvc:interceptor>  
+	        <mvc:mapping path="/**" />
+	        <bean class="com.dpp.rent.app.web.interceptor.LogRequestInterceptor"/>  
+	    </mvc:interceptor>  
+	</mvc:interceptors>   
+    
+    <bean class="com.dpp.rent.app.web.exception.CustomExceptionResolver"></bean>
+    
+    <import resource="classpath*:spring-dao.xml" />
+</beans>
