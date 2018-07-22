@@ -50,7 +50,7 @@ public class CommonController {
 	@ResponseBody
     public JsonReturn login(String reqData,SmsForm smsForm){
 		smsForm = (SmsForm) DataUtil.ParseForm(reqData, smsForm.getClass());
-		commonService.sendSms(smsForm);;
+		commonService.sendSms(smsForm);
 		return JsonReturn.ok();
     }
 	
